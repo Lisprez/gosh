@@ -1,0 +1,25 @@
+Gosh Community Freeware License (GCFL)
+Version 1.0, September 2026
+
+Permission is hereby granted, free of charge, to any person or automated agent
+obtaining a copy of the Gosh executable binaries ("Software"), to use, copy, run,
+and execute the Software without restriction, including without limitation the
+rights to use, run in production, integrate into AI workflows, commercial applications,
+cloud servers, and enterprise systems, subject to the following conditions:
+
+1. NO FEES: The Software is provided free of charge forever. No license key,
+   subscription, or payment shall ever be required for its execution.
+2. NO REVERSE ENGINEERING: The Software is distributed in compiled binary form.
+   Users may not decompile, disassemble, or reverse-engineer the binary engine.
+3. NO REDISTRIBUTION UNDER DIFFERENT NAME: You may redistribute unmodified official
+   binaries provided that original attribution to Gosh is preserved.
+4. PRIVACY GUARANTEE: The Software contains zero telemetry, zero trackers, and
+   zero network phone-home capabilities. Execution is 100% local and private.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

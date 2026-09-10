@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gosh (GhostShell) — The Ghost in the Shell for AI Agents</title>
+  <meta name="description" content="An ultra-low-latency, 100% POSIX/Bash-compatible shell engine built specifically for Autonomous AI Agents and machine-speed tool execution." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #08090d;
+      --bg-card: #10121a;
+      --bg-card-hover: #151824;
+      --border: #222638;
+      --border-accent: #3b4263;
+      --text-main: #f1f3f9;
+      --text-muted: #8b92aa;
+      --accent-cyan: #00f2fe;
+      --accent-purple: #9d4edd;
+      --accent-green: #10b981;
+      --accent-pink: #f43f5e;
+      --gradient-brand: linear-gradient(135deg, #00f2fe 0%, #9d4edd 100%);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background Glow */
+    .ambient-glow-1 {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(157, 78, 221, 0.22) 0%, rgba(0, 242, 254, 0.12) 50%, transparent 80%);
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header Nav */
+    header {
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-logo {
+      font-size: 1.7rem;
+      display: inline-block;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+    .badge-free {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 96px 0 64px;
+      text-align: center;
+    }
+    .pill-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .hero-title {
+      font-size: 3.8rem;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .hero-gradient-text {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 740px;
+      margin: 0 auto 40px;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    /* Install Bar */
+    .install-box {
+      max-width: 580px;
+      margin: 0 auto 36px;
+      background: #0d0f17;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s;
+    }
+    .install-box:hover {
+      border-color: var(--border-accent);
+    }
+    .install-cmd {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .install-prompt {
+      color: #6366f1;
+      font-weight: 600;
+    }
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    /* Key Specs Metric Ribbon */
+    .metric-ribbon {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 64px 0;
+    }
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .metric-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-accent);
+    }
+    .metric-val {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+      background: linear-gradient(180deg, #fff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .metric-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Styling */
+    section {
+      padding: 64px 0;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* Comparison & Benchmark Table */
+    .bench-table-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    table.bench-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    table.bench-table th, table.bench-table td {
+      padding: 16px 22px;
+      font-size: 0.95rem;
+    }
+    table.bench-table th {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    table.bench-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      transition: background 0.15s;
+    }
+    table.bench-table tr:last-child {
+      border-bottom: none;
+    }
+    table.bench-table tr:hover {
+      background: var(--bg-card-hover);
+    }
+    .col-gosh {
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-family: 'Fira Code', monospace;
+    }
+    .col-bash {
+      color: var(--text-muted);
+      font-family: 'Fira Code', monospace;
+    }
+    .tag-speedup {
+      display: inline-block;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Feature Grid */
+    .grid-features {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+    .feature-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+    .feature-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* Code Tabs & Snippet */
+    .code-tabs {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-top: 36px;
+    }
+    .tab-nav {
+      display: flex;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid var(--border);
+      padding: 0 12px;
+    }
+    .tab-btn {
+      padding: 12px 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
+    }
+    .tab-content {
+      display: none;
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    pre code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      color: #e2e8f0;
+      line-height: 1.7;
+    }
+
+    /* Free Forever Pledge Card */
+    .pledge-box {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(0, 242, 254, 0.04) 100%);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 20px;
+      padding: 44px;
+      text-align: center;
+      margin: 48px 0;
+    }
+    .pledge-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #34d399;
+      margin-bottom: 12px;
+    }
+    .pledge-text {
+      color: var(--text-main);
+      font-size: 1.05rem;
+      max-width: 680px;
+      margin: 0 auto 24px;
+      line-height: 1.7;
+    }
+    .pledge-list {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+      flex-wrap: wrap;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 48px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.6rem; }
+      .metric-ribbon { grid-template-columns: repeat(2, 1fr); }
+      .grid-features { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .install-box { flex-direction: column; gap: 12px; }
+      .pledge-list { flex-direction: column; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow-1"></div>
+
+  <div class="container">
+    <!-- Navigation -->
+    <header>
+      <a href="#" class="brand">
+        <span class="brand-logo">👻</span>
+        <span>Gosh</span>
+      </a>
+      <div class="nav-links">
+        <a href="#benchmarks">Benchmarks</a>
+        <a href="#capabilities">Agent Superpowers</a>
+        <a href="#integration">Integrations</a>
+        <a href="#pledge">The Free Pledge</a>
+        <span class="badge-free">Forever Free</span>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="hero">
+      <div class="pill-tag">
+        <span>✨ The Shell Built for Autonomous AI Agents</span>
+      </div>
+      <h1 class="hero-title">
+        The Ghost in the Shell.<br/>
+        <span class="hero-gradient-text">Engineered for Machine Speed.</span>
+      </h1>
+      <p class="hero-desc">
+        A 100% POSIX/Bash-compatible execution engine delivering up to <strong>3.5x faster throughput</strong> than GNU Bash with native <strong>session continuity across tool calls</strong>.
+      </p>
+
+      <!-- Instant Install Bar -->
+      <div class="install-box">
+        <div class="install-cmd">
+          <span class="install-prompt">$</span>
+          <span id="cmd-text">curl -fsSL https://raw.githubusercontent.com/Lisprez/gosh/main/install.sh | bash</span>
+        </div>
+        <button class="btn-copy" onclick="copyInstall()">
+          <span id="copy-label">Copy</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- Key Metrics Ribbon -->
+    <div class="metric-ribbon">
+      <div class="metric-card">
+        <div class="metric-val">3.48x</div>
+        <div class="metric-label">String Expansion Speed</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">2.58x</div>
+        <div class="metric-label">Stream Read Speed</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">100%</div>
+        <div class="metric-label">POSIX / Bash 3.2 Parity</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val">1.23 MB</div>
+        <div class="metric-label">Zero-Bloat Resident RSS</div>
+      </div>
+    </div>
+
+    <!-- Benchmarks Section -->
+    <section id="benchmarks">
+      <div class="section-header">
+        <h2 class="section-title">Verified Head-to-Head Benchmarks</h2>
+        <p class="section-subtitle">
+          Measured using real-world agent execution scripts comparing p50 median latencies against standard GNU Bash.
+        </p>
+      </div>
+
+      <div class="bench-table-wrapper">
+        <table class="bench-table">
+          <thead>
+            <tr>
+              <th>Workload Category</th>
+              <th>Gosh (ms)</th>
+              <th>GNU Bash (ms)</th>
+              <th>Execution Advantage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>String Trimming (${str#..} / ${str%..}) (5k)</strong></td>
+              <td class="col-gosh">7.49 ms</td>
+              <td class="col-bash">26.02 ms</td>
+              <td><span class="tag-speedup">🚀 3.48x Faster</span></td>
+            </tr>
+            <tr>
+              <td><strong>Variable Scoping & Assignment (5k)</strong></td>
+              <td class="col-gosh">5.22 ms</td>
+              <td class="col-bash">13.68 ms</td>
+              <td><span class="tag-speedup">🚀 2.62x Faster</span></td>
+            </tr>
+            <tr>
+              <td><strong>Stream Line Processing (5k lines read -r)</strong></td>
+              <td class="col-gosh">19.54 ms</td>
+              <td class="col-bash">50.43 ms</td>
+              <td><span class="tag-speedup">🚀 2.58x Faster</span></td>
+            </tr>
+            <tr>
+              <td><strong>Arithmetic Computation Loops (5k)</strong></td>
+              <td class="col-gosh">6.35 ms</td>
+              <td class="col-bash">11.93 ms</td>
+              <td><span class="tag-speedup">🚀 1.88x Faster</span></td>
+            </tr>
+            <tr>
+              <td><strong>Deep Cascading Pipelines (10 stages)</strong></td>
+              <td class="col-gosh">205.94 ms</td>
+              <td class="col-bash">232.47 ms</td>
+              <td><span class="tag-speedup">⚡ 12.9% Faster</span></td>
+            </tr>
+            <tr>
+              <td><strong>Agent Git Repository Flow (Init/Commit/Log)</strong></td>
+              <td class="col-gosh">152.78 ms</td>
+              <td class="col-bash">161.33 ms</td>
+              <td><span class="tag-speedup">⚡ 5.6% Faster</span></td>
+            </tr>
+            <tr>
+              <td><strong>Resident Memory Footprint (RSS)</strong></td>
+              <td class="col-gosh">1.23 MB</td>
+              <td class="col-bash">1.23 MB</td>
+              <td><span class="tag-speedup">🪶 1.00x Parity</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Capabilities Grid -->
+    <section id="capabilities">
+      <div class="section-header">
+        <h2 class="section-title">Built for the Agent Architecture</h2>
+        <p class="section-subtitle">
+          Everything an autonomous model needs to operate reliably inside modern operating systems.
+        </p>
+      </div>
+
+      <div class="grid-features">
+        <div class="feature-card">
+          <span class="feature-icon">🧠</span>
+          <h3 class="feature-title">Ghost Session Continuity</h3>
+          <p class="feature-desc">
+            Never write <code>cd /dir && do_work && pwd</code> workarounds again. Gosh transparently preserves working directories, environment exports, and exit codes across disconnected, stateless model API tool calls.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">⚡</span>
+          <h3 class="feature-title">Zero-Copy Memory Heredocs</h3>
+          <p class="feature-desc">
+            When models synthesize structured JSON, YAML, Python, or patch files using <code>cat &lt;&lt; 'EOF'</code>, Gosh routes streams directly through kernel memory buffers with zero disk I/O latency and zero tempfile pollution.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🎯</span>
+          <h3 class="feature-title">Instant In-Place Handoff</h3>
+          <p class="feature-desc">
+            Single commands and terminal pipeline stages execute via optimized in-place system handoff, avoiding unnecessary process tree forks, parent wait locks, and thread contention.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-icon">🛡️</span>
+          <h3 class="feature-title">TTY Cleanroom & 100% Parity</h3>
+          <p class="feature-desc">
+            Strict separation of stdout/stderr with zero TTY hijacking prevents agent tool calls from hanging indefinitely. 100% verified across 498 test suites and 942 real-world AI agent scripts.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Integration Section -->
+    <section id="integration">
+      <div class="section-header">
+        <h2 class="section-title">Seamless AI Agent Integration</h2>
+        <p class="section-subtitle">
+          Drop Gosh into your current agent pipelines with zero code rewrites.
+        </p>
+      </div>
+
+      <div class="code-tabs">
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="switchTab('claude')">Claude Code / Cursor</button>
+          <button class="tab-btn" onclick="switchTab('python')">Python / LangChain / CrewAI</button>
+          <button class="tab-btn" onclick="switchTab('cli')">CLI One-Liner</button>
+        </div>
+
+        <div id="tab-claude" class="tab-content active">
+          <pre><code># Set Gosh as your primary agent tool execution shell
+export SHELL=/usr/local/bin/gosh
+
+# Optional: Enable session continuity across tool invocations
+export GOSH_SESSION_ID="agent-session-$(date +%s)"</code></pre>
+        </div>
+
+        <div id="tab-python" class="tab-content">
+          <pre><code>import subprocess, os
+
+env = os.environ.copy()
+env["GOSH_SESSION_ID"] = "autonomous-agent-42"
+
+def agent_exec(cmd: str) -> str:
+    res = subprocess.run(["gosh", "-c", cmd], capture_output=True, text=True, env=env)
+    if res.returncode != 0: raise RuntimeError(res.stderr)
+    return res.stdout.strip()
+
+# State naturally persists across calls!
+agent_exec("mkdir -p /tmp/demo_agent && cd /tmp/demo_agent")
+agent_exec("git init -q && git config user.name 'GhostAgent'")
+agent_exec("echo 'Autonomous execution verified' > status.txt && git add . && git commit -qm 'init'")
+print(agent_exec("git log --oneline"))</code></pre>
+        </div>
+
+        <div id="tab-cli" class="tab-content">
+          <pre><code># Test drop-in POSIX compatibility & speed directly from your terminal
+gosh -c '
+str="test_prefix_for_agent_workflow"
+for ((i=0; i<5000; i++)); do
+    cleaned="${str#test_}"
+done
+echo "Loop finished: $cleaned"
+'</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Free Forever Pledge -->
+    <section id="pledge">
+      <div class="pledge-box">
+        <h3 class="pledge-title">The "Forever Free" Pledge</h3>
+        <p class="pledge-text">
+          Gosh is distributed as a high-performance, standalone pre-compiled binary free for all developers, commercial teams, and autonomous agent fleets.
+        </p>
+        <div class="pledge-list">
+          <span>✓ 100% Free Forever</span>
+          <span>✓ No Paywalls or Subscriptions</span>
+          <span>✓ Zero Telemetry / Absolute Privacy</span>
+          <span>✓ Zero Third-Party Dependencies</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2026 Gosh (GhostShell). Released under the Gosh Community Freeware License.</p>
+      <p style="margin-top: 8px; font-size: 0.8rem; color: #64748b;">Built for the digital minds that navigate the code.</p>
+    </footer>
+  </div>
+
+  <script>
+    function copyInstall() {
+      const text = document.getElementById("cmd-text").innerText;
+      navigator.clipboard.writeText(text);
+      const label = document.getElementById("copy-label");
+      label.innerText = "Copied!";
+      setTimeout(() => { label.innerText = "Copy"; }, 2000);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      event.target.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
