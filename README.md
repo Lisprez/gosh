@@ -1,6 +1,7 @@
 # Gosh (GhostShell) 👻
 
 > **The Ghost in the Shell — Engineered for Machine Speed.**
+> **The more agents you have, the more time Gosh saves you.**
 > A 100% POSIX/Bash-compatible high-performance execution engine designed for AI Agents, autonomous systems, and developers who demand zero execution overhead.
 
 [![License: Freeware](https://img.shields.io/badge/License-Freeware-blue.svg)](LICENSE)
@@ -18,11 +19,6 @@
 
 Run in your terminal (macOS / Linux):
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/Lisprez/gosh/main/install.sh | bash
-```
-
-*Or if you prefer the GitHub Pages URL:*
 ```bash
 curl -fsSL https://Lisprez.github.io/gosh/install.sh | bash
 ```
